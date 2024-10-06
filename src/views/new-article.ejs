@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1><%= article ? "Edit Article" : "New Article" %></h1>
+      <section class="newArticle">
+        <form action="/admin/newArticle" method="POST">
+          <div>
+            <label for="title">Article Title</label>
+            <input
+              type="text"
+              name="title"
+              id="title"
+              value="<%= article?.title %>"
+            />
+          </div>
+          <div>
+            <label for="author">Author</label>
+            <input
+              type="text"
+              name="author"
+              id="author"
+              value="<%= article?.author %>"
+            />
+          </div>
+          <div>
+            <label for="body">Body</label>
+            <textarea name="body" id="body"><%= article?.body %></textarea>
+          </div>
+
+          <div>
+            <button type="submit">Submit</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </body>
+</html>
