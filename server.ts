@@ -19,7 +19,7 @@ app.get("/", (req: Request, res: Response) => {
   res.render("index", { articles, admin: false });
 });
 
-app.use(express.static("src/public"));
+app.use(express.static("src/public")); // serve static files
 
 app.use("/admin", adminRoutes);
 app.use("/article", articleRoutes);
