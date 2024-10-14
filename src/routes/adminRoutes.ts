@@ -1,47 +1,64 @@
 import express, { Request, Response } from "express";
-import { createNewArticle } from "../services/admin.service";
-import { findFileWithURL, getAllArticles } from "../utils/functions";
+import {
+  createNewArticle,
+  deleteArticle,
+  getArticleToUpdate,
+  updateNewArticle,
+} from "../services/admin.service";
+import { ensureAuthenticated } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
 router.get("/new-article", (req: Request, res: Response) => {
-  res.render("new-article");
+  res.render("new-article", { article: {}, user: req.user, edit: false });
 });
 
-router.post("/newArticle", (req: Request, res: Response) => {
-  console.log(req.body);
-  const { title, author, body } = req.body;
-  const response = createNewArticle(title, author, body);
-  if (response.status === true) {
-    res.redirect("/");
+router.post(
+  "/new-article",
+  ensureAuthenticated,
+  async (req: Request, res: Response) => {
+    if (req.user) {
+      const response = await createNewArticle(req.body, (req.user as any)._id);
+
+      if (response?.status === true) {
+        res.redirect("/");
+      }
+    }
+  }
+);
+
+router.get("/edit-article/:slug", async (req: Request, res: Response) => {
+  const slug = req.params.slug;
+  if (slug) {
+    const article = await getArticleToUpdate(slug);
+    if (article.status) {
+      res.render("new-article", {
+        article: article.article,
+        edit: true,
+        user: req.user,
+        slug,
+      });
+    } else {
+      res.render("error", { error: `Article with slug ${slug} not found` });
+    }
   }
 });
 
-router.get("/", (req: Request, res: Response) => {
-  const articles = getAllArticles();
-  res.render("index", { articles, admin: true });
-});
+router.post(
+  "/edit-article/:slug",
+  ensureAuthenticated,
+  async (req: Request, res: Response) => {
+    const response = await updateNewArticle(req.body, req.params.slug);
+    if (response?.status === true) {
+      res.redirect("/");
+    }
+  }
+);
 
-router.get("/edit-article/:url", (req: Request, res: Response) => {
-  const url = req.params.url;
-  const article = JSON.parse(findFileWithURL(url));
-  res.render("new-article", { article });
-});
-
-router.post("/edit-article/:url", (req: Request, res: Response) => {
-  const url = req.params.url;
-  const article = JSON.parse(findFileWithURL(url));
-  const { title, author, body } = req.body;
-  const updatedArticle = {
-    ...article,
-    title,
-    author,
-    body,
-    updatedAt: new Date(),
-  };
-  const response = createNewArticle(title, author, body);
-  if (response.status === true) {
-    res.redirect("/");
+router.delete("/delete-article/:slug", async (req: Request, res: Response) => {
+  const response = await deleteArticle(req.params.slug);
+  if (response.status) {
+    res.redirect("/profile");
   }
 });
 

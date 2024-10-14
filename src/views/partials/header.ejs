@@ -1,0 +1,33 @@
+<header class="header__container">
+  <div class="header-title" onclick="navigateToRoute('/')">
+    <h1>DevTo</h1>
+  </div>
+  <div class="header-right" style="display: flex; align-items: center">
+    <div class="current-route" style="margin-right: 20px">
+      <ul>
+        <% routes.map(function(routeObj, index) { %>
+        <li onclick="navigateToRoute('<%= routeObj.route %>')">
+          <div><%= routeObj.name %></div>
+          <span><%= index === routes.length - 1 ? "" : "/" %></span>
+        </li>
+        <% }); %>
+      </ul>
+    </div>
+    <div class="profile-section">
+      <p
+        style="margin-left: 10px; cursor: pointer"
+        onclick="navigateToRoute('/profile')"
+      >
+        <%= userName %>
+      </p>
+      <p style="margin-left: 10px" onclick="navigateToRoute('/logout')">
+        Logout
+      </p>
+    </div>
+  </div>
+  <script>
+    function navigateToRoute(route) {
+      window.location.href = route;
+    }
+  </script>
+</header>

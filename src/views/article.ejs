@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= article.title %></title>
+    <link rel="stylesheet" href="/styles.css" />
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -40,21 +41,126 @@
       section p {
         color: #333;
       }
+      .comment_input {
+        margin: 0 auto;
+        margin-top: 20px;
+        padding: 20px;
+        background: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .comment_box {
+        border-radius: 8px;
+        padding: 10px;
+        width: 100%;
+      }
+      .comments {
+        width: 80%;
+        margin: 20px auto;
+      }
+   
+      .comment_input textarea {
+        width: 80%;
+        padding: 10px;
+        margin: 0 auto;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+      }
+      .comment_button {
+        display: flex;
+        justify-content: flex-end;
+      }
+      .comment_button button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .comment_input button:hover {
+        background-color: #555;
+      }
+      .comment_textarea {
+        background-color: red;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      .comment_addComment {
+        height: 30px;
+        background-color: white;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s all;
+        border: 1px solid black;
+        margin: 5px 0;
+      }
+      .comment_addComment:hover {
+        background-color: black;
+        color: white;
+      }
+      .comment_heading {
+        display: flex;
+        gap: 10px;
+      }
+      .comment_heading p {
+        color: #ccc;
+      }
     </style>
   </head>
   <body>
+    <%- include('partials/header', { routes: [ { name: "Home", route: "/" }, {
+    name: "Articles", route: "/articles" }, { name: article.title, route: "#" }
+    ], profilePicture: '/path/to/profile.jpg', userName: user?.username }) %>
     <div class="container">
       <article>
         <header>
           <h1><%= article.title %></h1>
-          <p>By <%= article.author %></p>
+          <p>By <%= article?.author?.name %></p>
           <p>Created at: <%= article.createdAt %></p>
           <p>Updated at: <%= article.updatedAt %></p>
         </header>
         <section>
-          <p><%= article.body %></p>
+          <p><%= article.content %></p>
         </section>
       </article>
+    </div>
+    <div class="comments">
+      <% article.comments.forEach(function(comment) { %>
+      <div class="comment_box">
+        <div class="comment_heading">
+          <h5 class="comment_author"><%= comment?.user?.name %></h5>
+          <p class="comment_date"><%= comment.createdAt %></p>
+        </div>
+
+        <p class="comment_content"><%= comment?.content %></p>
+
+        <button class="comment_addComment">Add Comment</button>
+      </div>
+      <% }); %>
+    </div>
+    <div class="comment_input">
+      <form action="/article/comment/<%= article._id %>" method="POST">
+        <div class="comment_textarea">
+          <textarea
+            name="content"
+            rows="5"
+            cols="40"
+            placeholder="Write your comment here..."
+            required
+          ></textarea> 
+           <div class="comment_button"></div>
+          <button type="submit">Submit Comment</button>
+        </div>
+        </div>
+      
+      </form>
     </div>
   </body>
 </html>

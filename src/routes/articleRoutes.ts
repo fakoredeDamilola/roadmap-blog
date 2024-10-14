@@ -1,27 +1,43 @@
 import express, { Request, Response } from "express";
-import { findFileWithURL, formatDate } from "../utils/functions";
+import {
+  createNewCommentForArticle,
+  getArticleBySlug,
+} from "../services/article.service";
+import { ensureAuthenticated } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
-router.get("/:url", (req: Request, res: Response) => {
-  const url = req.params.url;
-  if (url) {
-    const article = JSON.parse(findFileWithURL(url));
-    article.createdAt =
-      article.createdAt.split("T")[0] +
-      " " +
-      article.createdAt.split("T")[1].split(".")[0];
-    article.updatedAt =
-      article.updatedAt.split("T")[0] +
-      " " +
-      article.updatedAt.split("T")[1].split(".")[0];
-    if (!article) {
-      return res.status(404).render("404", { message: "Article not found!" });
+router.get("/:slug", async (req: Request, res: Response) => {
+  const slug = req.params.slug;
+  try {
+    if (slug) {
+      const response = await getArticleBySlug(slug);
+      if (response?.response === false) {
+      } else {
+        const { article } = response;
+        res.render("article", { article, user: req.user });
+      }
     }
-
-    console.log(article);
-    res.render("article", { article });
+  } catch (e) {
+    res.render("error", { message: "Article not found", user: req?.user });
   }
 });
+
+router.post(
+  "/comment/:articleId",
+  ensureAuthenticated,
+  async (req: Request, res: Response) => {
+    const { content } = req.body;
+    const response = await createNewCommentForArticle(
+      (req?.user as any)._id,
+      content,
+      req?.params?.articleId,
+      req.body?.commentId
+    );
+    if (response.status) {
+      res.redirect(`/article/${response?.response?.slug}`);
+    }
+  }
+);
 
 export default router;

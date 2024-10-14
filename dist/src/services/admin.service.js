@@ -26,3 +26,6 @@ const createNewArticle = (title, author, body) => {
     }
 };
 exports.createNewArticle = createNewArticle;
+const updateArticle = (title, author, body) => {
+    const getFileName = title.split(" ").join("_");
+};

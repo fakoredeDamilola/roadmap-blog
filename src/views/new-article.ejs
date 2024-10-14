@@ -7,10 +7,17 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <div class="container">
+    <%- include('partials/header', { routes:[{name: "Home", route: "/"}, {name:
+    article ? "Edit Article" : "Create New Article", route: "#"}],
+    profilePicture: '/path/to/profile.jpg', userName: user?.username }) %>
+
+    <div class="new_container">
       <h1><%= article ? "Edit Article" : "New Article" %></h1>
       <section class="newArticle">
-        <form action="/admin/newArticle" method="POST">
+        <form
+          action="<%= edit ? '/admin/edit-article/' + slug : '/admin/new-article' %>"
+          method="POST"
+        >
           <div>
             <label for="title">Article Title</label>
             <input
@@ -21,21 +28,32 @@
             />
           </div>
           <div>
-            <label for="author">Author</label>
+            <label for="slug">Article Slug</label>
             <input
               type="text"
-              name="author"
-              id="author"
-              value="<%= article?.author %>"
+              name="slug"
+              id="slug"
+              value="<%= article?.slug %>"
             />
           </div>
           <div>
-            <label for="body">Body</label>
-            <textarea name="body" id="body"><%= article?.body %></textarea>
+            <label for="description">Short Description</label>
+            <input
+              type="text"
+              name="description"
+              id="description"
+              value="<%= article?.description %>"
+            />
+          </div>
+          <div>
+            <label for="content">content</label>
+            <textarea name="content" id="content">
+<%= article?.content %></textarea
+            >
           </div>
 
           <div>
-            <button type="submit">Submit</button>
+            <button type="submit"><%= edit ? "Update" : "Submit" %></button>
           </div>
         </form>
       </section>
